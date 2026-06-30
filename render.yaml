@@ -31,11 +31,11 @@ services:
   # 3. React Frontend Client (Static Site builder)
   - type: web
     name: lifesaver-frontend
-    env: static
+    runtime: static
     plan: free
-    root: client
+    rootDir: client
     buildCommand: npm run build
-    publishDir: dist
+    staticPublishPath: dist
     envVars:
       - key: VITE_API_URL
         fromService:
