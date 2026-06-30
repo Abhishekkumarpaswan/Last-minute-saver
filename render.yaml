@@ -1,0 +1,45 @@
+services:
+  # 1. FastAPI AI Service (Python container)
+  - type: web
+    name: lifesaver-ai-service
+    env: docker
+    plan: free
+    dockerContext: ai-service
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: GROQ_API_KEY
+        sync: false # Enter your Groq API key in the Render dashboard
+
+  # 2. Express Backend Server (Node.js container)
+  - type: web
+    name: lifesaver-backend
+    env: docker
+    plan: free
+    dockerContext: server
+    dockerfilePath: Dockerfile
+    envVars:
+      - key: MONGO_URI
+        sync: false # Enter your MongoDB Atlas connection string in the Render dashboard
+      - key: JWT_SECRET
+        generateValue: true # Generates a secure random key automatically
+      - key: AI_SERVICE_URL
+        fromService:
+          name: lifesaver-ai-service
+          type: web
+          property: url
+
+  # 3. React Frontend Client (Static Site builder)
+  - type: web
+    name: lifesaver-frontend
+    env: static
+    plan: free
+    root: client
+    buildCommand: npm run build
+    publishDir: dist
+    envVars:
+      - key: VITE_API_URL
+        fromService:
+          name: lifesaver-backend
+          type: web
+          property: url
+        value: ${value}/api
