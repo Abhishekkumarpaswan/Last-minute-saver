@@ -22,11 +22,18 @@ services:
         sync: false # Enter your MongoDB Atlas connection string in the Render dashboard
       - key: JWT_SECRET
         generateValue: true # Generates a secure random key automatically
-      - key: AI_SERVICE_URL
+      - key: AI_HOST
         fromService:
           name: lifesaver-ai-service
           type: web
-          property: url
+          property: host
+      - key: AI_PORT
+        fromService:
+          name: lifesaver-ai-service
+          type: web
+          property: port
+      - key: AI_SERVICE_URL
+        value: http://${AI_HOST}:${AI_PORT}
 
   # 3. React Frontend Client (Static Site builder)
   - type: web
@@ -37,9 +44,10 @@ services:
     buildCommand: npm run build
     staticPublishPath: dist
     envVars:
-      - key: VITE_API_URL
+      - key: BACKEND_HOST
         fromService:
           name: lifesaver-backend
           type: web
-          property: url
-        value: ${value}/api
+          property: host
+      - key: VITE_API_URL
+        value: https://${BACKEND_HOST}/api
